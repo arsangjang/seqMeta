@@ -9,6 +9,9 @@
 ### Required packages:
 
 ```{r}
+setwd("D:/folder")
+install_github("brentp/skatMeta")
+
 library(CompQuadForm)
 library(twostageGWASsurvival)
 library(seqMeta)
