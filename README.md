@@ -34,6 +34,8 @@ library(Matrix)
 
 To create Z we need allele data set contains individuals ID and position:
 
+               allel_binary_data.txt
+
 | Pos | Ref | Alter | sample 1 | sample 2 | sample 3 |
 |-----|-----|-------|----------|----------|----------|
 | 45  | A   | G     | 1        | 1        | 0        |
@@ -41,7 +43,6 @@ To create Z we need allele data set contains individuals ID and position:
 | 86  | T   | C     | 0        | 0        | 0        |
 
 ```{r}
-
 genomatrix = read.table("allel_binary_data.txt",header=TRUE)
 snpInfo = read.csv('SNPInfo.csv',header=TRUE)
 names(genomatrix)
