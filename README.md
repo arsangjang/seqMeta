@@ -56,10 +56,9 @@ colnames(genomatrix) = snpInfo$SNP
 ### Runing survival model
 
 ```{r}
-### REL
 cox_model<-prepCox(genomatrix, Surv(time,binary_outcome) ~ Age +  Sex +  intervention, 
              SNPInfo = SNPInfo, data = y_data, verbose = FALSE)
 
-outa <- skatMeta(cox, SNPInfo = SNPInfo)
-head(outa)
+output_cox <- skatMeta(cox_model, SNPInfo = SNPInfo)
+head(output_cox)
 ```
