@@ -31,3 +31,23 @@ library(Matrix)
 3- Z matrix (Genotype Matrix): This matrix represents the genotype data for the genetic variants. The rows of this matrix correspond to individual samples, while the columns indicate the SNP names (genetic loci). The entries of the matrix represent the alleles present at each SNP for each individual. It is generally a binary matrix, where 0 denotes one allele and 1 denotes the other allele.
 
 [![](Z matrix.PNG)](https://drive.google.com/file/d/10t80BN7hGG4__dXEF_IGA_uQyzgflGpU/view?usp=drive_link)
+
+To create Z we need allele data set contains individuals ID and position:
+
+| Pos | Ref | Alter | sample 1 | sample 2 | sample 3 |
+|-----|-----|-------|----------|----------|----------|
+| 45  | A   | G     | 1        | 1        | 0        |
+| 158 | TG  | G     | 0        | 1        | 0        |
+| 86  | T   | C     | 0        | 0        | 0        |
+
+```{r}
+
+genomatrix = read.table("allel_binary_data.txt",header=TRUE)
+snpInfo = read.csv('SNPInfo.csv',header=TRUE)
+names(genomatrix)
+
+I = match(snpInfo$POS, genomatrix$POS)
+genomatrix = genomatrix[I,]
+genomatrix = t(genomatrix[,-c(1:3)])
+colnames(genomatrix) = snpInfo$SNP
+``` 
