@@ -57,7 +57,7 @@ colnames(genomatrix) = snpInfo$SNP
 
 ```{r}
 cox_model<-prepCox(genomatrix, Surv(time,binary_outcome) ~ Age +  Sex +  intervention, 
-             SNPInfo = SNPInfo, data = y_data, verbose = FALSE)
+             SNPInfo = SNPInfo, data = my_data, verbose = FALSE)
 
 output_cox <- skatMeta(cox_model, SNPInfo = SNPInfo)
 head(output_cox)
