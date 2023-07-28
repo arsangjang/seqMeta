@@ -62,3 +62,59 @@ cox_model<-prepCox(genomatrix, Surv(time,binary_outcome) ~ Age +  Sex +  interve
 output_cox <- skatMeta(cox_model, SNPInfo = SNPInfo)
 head(output_cox)
 ```
+
+
+## SKAT Optimal Test
+
+SKAT O Test introduced to test weighted averages of SKAT & burden tests
+
+```{r}
+cox_model1<- prepScores(genomatrix_a, outcome ~ sex+age+ intervention, 
+             SNPInfo = SNPInfo, data = my_data, verbose = FALSE)
+
+cox_model2<-prepScores(genomatrix_b, outcome ~ sex+age+ intervention, 
+             SNPInfo = SNPInfo, data = my_data_b, verbose = FALSE)
+
+
+Out_combined <- skatOMeta(cox_model1,cox_model2, SNPInfo=SNPInfo, method="int")
+
+head(Out_combined)
+
+```
+##Survival data
+
+```{r}
+#survival model 1
+Cox_model1<-prepCox(genomatrixS, Surv(time,rel) ~ sex+age+ intervention,
+                    SNPInfo = SNPInfo, data = my_data, verbose = FALSE)
+
+out.Cox_model1 <- skatOMeta(Cox_model1, SNPInfo = SNPInfo)
+head(out.Cox_model1)
+
+#survival model 2
+Cox_model2<-prepCox(genomatrix_b, Surv(time,rel) ~   sex+age+ intervention, 
+             SNPInfo = SNPInfo, data = my_data_b, verbose = FALSE)
+
+out_Cox_model2 <- skatMeta(Cox_model2, SNPInfo = SNPInfo)
+head(out.Cox_model2)
+
+
+overall_Cox <- skatOMeta(Cox_model1, Cox_model2, SNPInfo = SNPInfo)
+head(overall_Cox)
+
+```
+
+## Results from the SKAT test
+
+| gene         | p                   | pmin        | rho      | cmaf                              | nmiss             | nsnps              | errflag             |
+|--------|--------|--------|-------|-------------|-----------|---------|-----------|
+| Name of Gene | P-value: is \<0.05? | Min P-value | 𝜌 (0, 1) | Cumulative minor allele frequency | n of missing SNPs | n SNPs in the gene | Inaccurate p-values |
+
+Ref.
+
+[seqMeta](http://cran.nexr.com/web/packages/seqMeta/seqMeta.pdf)
+
+[seqMeta: an R Package for meta-analyzing region-based tests of rare DNA variants](https://rdrr.io/cran/seqMeta/f/inst/doc/seqMeta.pdf)
+
+[Meta-MultiSKAT: Multiple phenotype meta-analysis for region-based association test](https://www.biorxiv.org/content/10.1101/593814v1.full)
+
