@@ -110,6 +110,108 @@ head(overall_Cox)
 |--------|--------|--------|-------|-------------|-----------|---------|-----------|
 | Name of Gene | P-value: is \<0.05? | Min P-value | 𝜌 (0, 1) | Cumulative minor allele frequency | n of missing SNPs | n SNPs in the gene | Inaccurate p-values |
 
+
+
+
+
+
+rm(list = ls())
+
+## Load libraries
+library(tidyverse)
+library(seqMeta)
+library(CompQuadForm)
+library(twostageGWASsurvival)
+library(MASS)
+library(writexl)
+library(readxl)
+library(Matrix)
+library(rmarkdown)
+library(knitr)
+library(data.table)
+library(gtsummary)
+library(dplyr)
+
+# Set directory
+setwd("C:/Users/Sarsangjang/Desktop/GVHD Project/Results_SKAT-o_March2026_JCO_reply")
+
+
+#### 1-a) Prepare data for main analysis (*only one time*)
+
+
+# Read validation dataset- NCI
+genomatrixV = read.table("C:/Users/Sarsangjang/Desktop/GVHD Project/Results_SKAT-o_March2026_JCO_reply/MDS295_2942_binary.txt",header=TRUE)
+snpInfoV = read.csv('C:/Users/Sarsangjang/Desktop/GVHD Project/Results_SKAT-o_March2026_JCO_reply/SNV_info_excluded_non-coding.csv',header=TRUE)
+pheno_fileV = read_excel("C:/Users/Sarsangjang/Desktop/GVHD Project/Results_SKAT-o_March2026_JCO_reply/MDS295_clinical_R3.xlsx")
+
+pheno_fileV$event_aGvhD24[pheno_fileV$event_aGvhD24==98] <- NA
+pheno_fileV$event_aGvhD34[pheno_fileV$event_aGvhD34==98] <- NA
+pheno_fileV$cgvhd[pheno_fileV$cgvhd== 99] <- NA
+
+
+pheno_fileV$event_aGvhD24<-as.numeric(pheno_fileV$event_aGvhD24)
+pheno_fileV$event_aGvhD34<-as.numeric(pheno_fileV$event_aGvhD34)
+pheno_fileV$intxagvhd24<-as.numeric(pheno_fileV$intxagvhd24)
+pheno_fileV$intxagvhd34<-as.numeric(pheno_fileV$intxagvhd34)
+pheno_fileV$intxcgvhd<-as.numeric(pheno_fileV$intxcgvhd)
+pheno_fileV$cgvhd<-as.numeric(pheno_fileV$cgvhd)
+pheno_fileV$prophx<-as.numeric (pheno_fileV$prophx)
+
+# Remove rows where prophx and cgvhd is NA
+pheno_fileV <- pheno_fileV[!is.na(pheno_fileV$prophx), ]
+pheno_fileV <- pheno_fileV[!is.na(pheno_fileV$cgvhd), ]
+
+nrow(pheno_fileV) # 285
+
+##### 1-c) Create genomatrix for cox model to merge snpInfo and genomatrix info- recipients
+
+
+IV = match(snpInfoV$POS, genomatrixV$POS)
+
+genomatrixV = genomatrixV[IV,]
+
+genomatrixV = t(genomatrixV[,-c(1:3)])
+
+colnames(genomatrixV) = snpInfoV$SNP
+
+
+samplesV = row.names(genomatrixV)
+IV = match(as.character(pheno_fileV$subject_id),samplesV)
+genomatrixV = genomatrixV[IV,]
+
+rownames(genomatrixV) <- pheno_fileV$subject_id
+
+
+
+aggregate_byV = 'Gene18b'
+
+
+
+
+
+# SeqMeta Glm model
+
+Fit_model_cgvhdn <- prepScores(
+  Z = genomatrixV,
+  formula = cgvhd ~ age +donorage+donorgp+atgcampathgp_r +prophx +pc1+ pc2,
+  family = binomial(),
+  SNPInfo = snpInfoV,
+  snpNames = "SNP",
+  aggregateBy = aggregate_byV,
+  data = pheno_fileV,
+  verbose = TRUE
+)
+
+Fit_skato_cgvhn  <- skatOMeta(
+  Fit_model_cgvhdn,
+  SNPInfo = snpInfoV,
+  aggregateBy = aggregate_byV,
+  snpNames = "SNP",
+  verbose = TRUE
+)
+
+
+
 Ref.
 
 [seqMeta](http://cran.nexr.com/web/packages/seqMeta/seqMeta.pdf)
